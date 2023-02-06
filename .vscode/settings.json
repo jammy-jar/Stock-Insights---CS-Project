@@ -1,0 +1,8 @@
+{
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/bda68acd-3fac-49cb-9f86-c741d12f4dd0/AppServices/subscriptions/bda68acd-3fac-49cb-9f86-c741d12f4dd0/resourceGroups/general/providers/Microsoft.Web/sites/stock-insights",
+    "appService.deploySubpath": "."
+}

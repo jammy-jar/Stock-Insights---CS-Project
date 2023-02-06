@@ -1,0 +1,40 @@
+header {
+    display: flex;
+    justify-content: left;
+    padding: 0 30px;
+    background-color: #191d32;
+}
+
+ul {
+    margin: 0;
+}
+
+hr {
+    margin: 0;
+    height: 1px;
+    background-color: #8f8f8faa;
+    border: none;
+}
+
+li {
+    display: inline-block;
+    list-style: none;
+}
+
+.right {
+    float: right;
+    position: absolute;
+    right: 40px;
+}
+
+button {
+    color: #b4b4b4;
+    background-color: #191d32;
+    border: 0px;
+    height: 40px;
+}
+
+button:hover {
+    background-color: #282f51;
+    transition: background-color 0.1s ease-in;
+}

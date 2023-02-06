@@ -1,0 +1,23 @@
+head
+  link(rel='stylesheet', href='/stylesheets/header.css')
+
+body
+  header
+    h1= title
+  nav(class="navbar")
+    ul
+      li
+        // This redirects the user to the watchlist page.
+        a(href='./') Menu 
+
+      li
+        // This redirects the user to the watchlist page.
+        a(href='./watchlist') Watchlist
+    
+      li(class="right")
+        // This redirects the user to the watchlist page. 
+        // I edited the style so it appears to the right of the page.
+        a(href='./login') Login
+  hr
+  script(src='/javascripts/navbar-actions.js')
+  

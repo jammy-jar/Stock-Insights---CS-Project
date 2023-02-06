@@ -1,0 +1,33 @@
+extends layout
+
+block content
+  main
+    form(action="" id="registerForm") 
+      p
+        label(for="username") Username:
+        input(type="text" name="newUsername" id="newUsername" placeholder="Username" autocomplete="username")
+
+      p
+        label(for="email") Email:
+        input(type="text" name="email" id="email" placeholder="Email" autocomplete="username")
+
+      p
+        label(for="password") New Password:
+        input(type="password" name="newPassword" id="newPassword" placeholder="Password" autocomplete="new-password")
+
+      p
+        label(for="passwordConfirmation") Confirm Password:
+        input(type="password" name="passwordConfirmation" id="passwordConfirmation" placeholder="Password" autocomplete="new-password")
+      
+      div(class="buttons")
+        button(id="submitRegister") Register
+
+    p Already have an account?
+    a(href='login') Go to Login
+        
+
+block styles
+  link(rel='stylesheet', href='/stylesheets/login.css')
+
+block scripts
+    

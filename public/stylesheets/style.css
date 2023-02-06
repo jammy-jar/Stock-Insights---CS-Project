@@ -1,0 +1,44 @@
+body {
+  margin: 0px;
+  background-color: #191d32;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+h1 {
+  color: #b4b4b4;
+}
+
+main {
+  align-items: center;
+  margin: 40px 20px;
+  background-color: #8b8c89;
+}
+
+section.filter {
+  display: inline-flex;
+}
+
+table {
+  border-collapse: collapse;
+  background-color: #8b8c89;
+  width: 100%;
+}
+
+table tr:nth-of-type(2n) {
+  background-color: #999a96;
+}
+
+table tr:hover {
+  background-color: #aeb0ac;
+}
+
+th, td {
+  padding: 10px 15px;
+  text-align: left;
+  border-bottom: 1px solid #e7ecef;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}

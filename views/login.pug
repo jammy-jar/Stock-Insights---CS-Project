@@ -1,0 +1,24 @@
+extends layout
+
+block content
+  main
+    form(action="" id="loginForm") 
+      p
+        label(for="username") Email/ Username:
+        input(type="text" name="existingUsername" id="existingUsername" placeholder="Username" autocomplete="username")
+
+      p
+        label(for="password") Password:
+        input(type="password" name="existingPassword" id="existingPassword" placeholder="Password" autocomplete="current-password")
+      
+      div(class="buttons")
+        button(id="submitLogin") Login 
+
+    p Don't have an account? 
+    a(href='./register') Go to Registration      
+
+block styles
+  link(rel='stylesheet', href='/stylesheets/login.css')
+
+block scripts
+    

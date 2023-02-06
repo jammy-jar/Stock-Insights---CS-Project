@@ -1,0 +1,39 @@
+extends layout
+
+block content
+  main
+    section(class="filter")
+      form(action="") 
+        input(type="text" name="search_query" placeholder="Search Stocks...")
+      form(action="") 
+        select(name="type" placeholder="Select Type..." onchange="this.form.submit()")
+          option(value="" disabled selected) Select Type...
+          - for (let type of types) {
+          option(value=type)=type
+          - }
+    section
+      table
+        thead
+          tr
+            th Symbol 
+            th Stock
+            th Price ($)
+            th 7 Day Forecast 
+            th 1 Year Forecast
+            th Stock Graph (1 Year)
+        tbody(id="stocksTable")
+
+block styles
+  link(rel='stylesheet', href='/stylesheets/index.css')
+
+block scripts
+  script.
+    const stocks = !{JSON.stringify(stocks)}
+    const types = !{JSON.stringify(types)}
+  script(src='./javascripts/load-data.js' type='module')
+//-
+  script.
+    const projectionData = !{JSON.stringify(projectionQuantiles)}
+    const actualData = !{JSON.stringify(actualData)}
+  script(type='module' src='/javascripts/plot-utility.js')
+  
