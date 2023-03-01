@@ -1,87 +1,76 @@
-// Import the file system module.
-import fs from 'fs';
-import path from 'path';
-import * as url from 'url';
-
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
-
-// Declare a function which creates a Json file to store historical data.
-const createDataJson = (symbol, data) => {
-    // Declare an array to store the formatted data.
-    // Iterate over each object (representing a day of stocks), 
-    // and create a new object consisting of only the date and close attributes.
-    const dataFormat = []
-    data.forEach(object => dataFormat.push({ 
-        date: object.date, 
-        close: object.close 
-    }));
-
-    // Convert the data to JSON.
-    const json = JSON.stringify(dataFormat);
-
-    // Create a new date object of the current date and time.
-    // Convert to JSON, and create a substring, to remove the time part.
-    const date = new Date().toJSON().substring(0, 10);
-
-    // Write a file in the '/historical' directory.
-    // Name the title based on the stock symbol, and todays date.
-    // Catch any errors that occur and log them.
-    fs.writeFileSync(path.join(__dirname, `../public/historical/${symbol + date}.json`), json, 'utf8', (error) => {
-    if (error) {
-        console.error(error);
+const saveStock = async (quote) => {
+    // Search the database for an existing stock and finds the first one matching the symbol.
+    let stockDbObject = await Stock.findOne({symbol: quote.symbol})
+  
+    // Get a display name for the stock, by default it is the long name,
+    // if it doesnt have one it is set to the short name, else it is set to the symbol.
+    let displayName;
+    if (quote.longName !== undefined) {
+        displayName = quote.longName;
+    } else if (quote.shortName !== undefined) {
+        displayName = quote.shortName;
     } else {
-        console.log('The file has been saved!');
+        displayName = quote.symbol;
     }
-    });
-}
+  
+    // Calculate last years date by taking todays date and subtracting milliseconds in a year.
+    const todaysDate = new Date()
+    const dateLastYear = new Date(todaysDate - 86400000 * 365);
+  
+    // Check if the found object was undefined, meaning no data currently 
+    // exists for it in the database. If so, then it fetches data for the stock via the API.
+    
+    // If data exists for it but the data is not up to date, then it fetches the new data,
+    // and appends it to the current data.
+    
+    // Else it just ends the function.
+    if (!stockDbObject) {
+      const data = await yahooFinance.historical(quote.symbol, { period1: dateLastYear })
+  
+      // Create a new stock object.
+      stockDbObject = new Stock({
+          symbol: quote.symbol,
+          name: displayName,
+          price: quote.regularMarketPrice,
+          type: quote.quoteType,
+          data
+      })
+    } else if (stockDbObject.data[stockDbObject.data.length - 1].date < todaysDate - 86400000) {
+      // Get the date of the last time data was updated but not recorded.
+      const lastUnrecordedData = new Date(stockDbObject.data[stockDbObject.data.length - 1].date.valueOf() + 86400000)
+  
+      if (lastUnrecordedData > new Date()) {
+        return
+      }
+  
+      // Fetch data from the last time data was not recorded.
+      const data = await yahooFinance.historical(quote.symbol, { period1: lastUnrecordedData })
+  
+      if (data[0].date >= lastUnrecordedData) {
+        console.log(stockDbObject.symbol)
+        console.log('Last Recorded: ' + stockDbObject.data[stockDbObject.data.length - 1].date)
+        console.log('New Data: ' + data[0].date)
+        console.log('Updating Outdated Data')
+  
+        // Push data to the rest of the data on the stock object.
+        stockDbObject.data = stockDbObject.data.concat(data)
+        console.log(stockDbObject.data[stockDbObject.data.length - 1])
+      }
+      // Update the regular market price to reflect up to date price which is constantly updating.
+      stockDbObject.price = quote.regularMarketPrice
+    }
+    else {
+      // Update the regular market price to reflect up to date price which is constantly updating.
+      stockDbObject.price = quote.regularMarketPrice
+    }
+  
+    // Save any changes.
+    await stockDbObject.save()
+    return stockDbObject
+  }
 
-// Declare a function that returns a boolean value based on if a data file exists
-// and is up to date.
-const existingJson = symbol => {
-    // Create a new date object of the current date, and convert to JSON.
-    const date = new Date().toJSON().substring(0, 10);
+  const dataHandler = {
+    saveStock,
+  }
 
-    // Checks if historical data file exists and returns boolean value.
-    return fs.existsSync(path.join(__dirname, `../public/historical/${symbol + date}.json`));
-}
-
-// Declare a function to delete outdated files in 'historical' directory when called.
-const deleteOldFiles = () => {
-    // Create a new date object of the current date, and convert to JSON.
-    const date = new Date().toJSON().substring(0, 10);
-    // Create a Regular Expression pattern with the date string.
-    const pattern = new RegExp(date);
-
-    // Read all the files in the 'historical' directory. Catch and print any errors.
-    // Callback function returns files array which is an array of the string file names in the directory.
-    fs.readdir(path.join(__dirname, `../public/historical/`), (error, files) => {
-        if (error) {
-            console.error(error);
-        }
-
-        // Use built in filter method to iterate through the files,
-        // and test which ones contain the RegEx string defined above.
-        // Any that return true to the test, are not included in the 'outDatedFiles' variable, 
-        // by use of not / '!'  operator.
-        const outdatedFiles = files.filter(file => !pattern.test(file));
-
-        // Iterate through each outdated file and uses the 'unlink' function to delete the file.
-        for (let file of outdatedFiles) {
-            fs.unlink(path.join(__dirname, `../public/historical/${file}`), (error) => {
-                if (error) {
-                    console.error(error);
-                }
-            });
-        }
-    });
-}
-
-// Declare an object of functions to be exported.
-const dataHandler = {
-    createDataJson,
-    existingJson,
-    deleteOldFiles
-}
-
-// Export the dataHandler object.
-export default dataHandler;
+  export default dataHandler

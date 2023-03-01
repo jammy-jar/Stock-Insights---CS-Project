@@ -2,6 +2,7 @@
 import express from 'express';
 import path from 'path'
 import * as url from 'url';
+import mongoose from 'mongoose'
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -17,7 +18,16 @@ const app = express();
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
+app.use(express.urlencoded({ extended: true }))
 app.use(express.static(path.join(__dirname, 'public')))
+
+mongoose.connect('mongodb://127.0.0.1:27017/stockApp')
+    .then(() => {
+        console.log('Mongo Connection Open!')
+    })
+    .catch(err => {
+        console.log('Failed to open Mongo Connection. Err: ' + err)
+    })
 
 // When the home directory receives a request, 
 // the request calls the functions defined in the index router file.
@@ -29,4 +39,3 @@ app.use('/register', registerRouter)
 app.listen(3000, () => {
     console.log("Connected to port 3000");
 });
-    

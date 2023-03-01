@@ -4,6 +4,7 @@ import yahooFinance from 'yahoo-finance2';
 
 // Import my modules.
 import financeModule from '../libs/finance-lib.js';
+import dataHandler from '../libs/data-handler.js'
 
 import Stock from '../models/stock.js'
 
@@ -56,106 +57,63 @@ async function updateService() {
   const stockQuotes = await financeModule.getTrendingStocks();
   
   // Iterate through each stock quote in the list and call the save function for each.
-  stockQuotes.forEach(quote => saveStock(quote))
+  stockQuotes.forEach(quote => dataHandler.saveStock(quote))
 
   // Set the function to recur every 5 minutes.
   setTimeout(updateService, 300000);
 }
 // updateService();
 
-const saveStock = async (quote) => {
-  // Search the database for an existing stock and finds the first one matching the symbol.
-  let stockDbObject = await Stock.findOne({symbol: quote.symbol})
-
-  // Get a display name for the stock, by default it is the long name,
-  // if it doesnt have one it is set to the short name, else it is set to the symbol.
-  let displayName;
-  if (quote.longName !== undefined) {
-      displayName = quote.longName;
-  } else if (quote.shortName !== undefined) {
-      displayName = quote.shortName;
-  } else {
-      displayName = quote.symbol;
-  }
-
-  // Calculate last years date by taking todays date and subtracting milliseconds in a year.
-  const todaysDate = new Date()
-  const dateLastYear = new Date(todaysDate - 86400000 * 365);
-
-  // Check if the found object was undefined, meaning no data currently 
-  // exists for it in the database. If so, then it fetches data for the stock via the API.
-  
-  // If data exists for it but the data is not up to date, then it fetches the new data,
-  // and appends it to the current data.
-  
-  // Else it just ends the function.
-  if (!stockDbObject) {
-    const data = await yahooFinance.historical(quote.symbol, { period1: dateLastYear })
-
-    // Create a new stock object.
-    stockDbObject = new Stock({
-        symbol: quote.symbol,
-        name: displayName,
-        price: quote.regularMarketPrice,
-        type: quote.quoteType,
-        data
-    })
-  } else if (stockDbObject.data[stockDbObject.data.length - 1].date < todaysDate - 86400000) {
-    // Get the date of the last time data was updated but not recorded.
-    const lastUnrecordedData = new Date(stockDbObject.data[stockDbObject.data.length - 1].date.valueOf() + 86400000)
-
-    if (lastUnrecordedData > new Date()) {
-      return
-    }
-
-    // Fetch data from the last time data was not recorded.
-    const data = await yahooFinance.historical(quote.symbol, { period1: lastUnrecordedData })
-
-    if (data[0].date >= lastUnrecordedData) {
-      console.log(stockDbObject.symbol)
-      console.log('Last Recorded: ' + stockDbObject.data[stockDbObject.data.length - 1].date)
-      console.log('New Data: ' + data[0].date)
-      console.log('Updating Outdated Data')
-
-      // Push data to the rest of the data on the stock object.
-      stockDbObject.data = stockDbObject.data.concat(data)
-      console.log(stockDbObject.data[stockDbObject.data.length - 1])
-    }
-    // Update the regular market price to reflect up to date price which is constantly updating.
-    stockDbObject.price = quote.regularMarketPrice
-  }
-  else {
-    // Update the regular market price to reflect up to date price which is constantly updating.
-    stockDbObject.price = quote.regularMarketPrice
-  }
-
-  // Save any changes.
-  await stockDbObject.save()
-  return stockDbObject
-}
-
 // Handle GET requests for the index router.
 router.get('/', async (req, res, next) => {
+  // Extract the variables from the request.
   const { search_all, search_query, type } = req.query;
 
   let stocks = [];
+  // If there is both a type filter and search query then it queries the database 
+  // and filters the results by type, and uses regex to filter if the name OR symbol
+  // matches the search query (ignoring the case).
+
+  // Else if there's only a type filter, it finds stocks by the type.
+  
+  // Else if there's only a search query it finds matching stocks using regex 
+  // to filter if the name OR symbol matches the search query (ignoring the case).
+
+  // Else it just fetches the first 100 stocks.
   if (type && search_query){
-    stocks = await Stock.find({ type, $or:[ { name: { $regex: search_query, $options: 'i' }, symbol: { $regex: search_query, $options: 'i' } } ] }).limit(100)
+    stocks = await Stock.find(
+      { type, $or:[ 
+        { 
+          name: { $regex: search_query, $options: 'i' },
+          symbol: { $regex: search_query, $options: 'i' } 
+        } 
+    ] }).limit(100) 
+
   } else if (search_all && type) {
     const quotes = await financeModule.getQueriedStocks(search_all)
     for (const quote of quotes) {
-      stocks.push(await saveStock(quote))
+      stocks.push(await dataHandler.saveStock(quote))
     }
     stocks = stocks.filter(stock => stock.type == type)
+
   } else if (type) {
     stocks = await Stock.find({ type }).limit(100)
+
   } else if (search_query) {
-    stocks = await Stock.find({ $or:[ { name: { $regex: search_query, $options: 'i' } },  { symbol: { $regex: search_query, $options: 'i' } } ] }).limit(100)
+    stocks = await Stock.find(
+      { $or:[ 
+        { 
+          name: { $regex: search_query, $options: 'i' },
+          symbol: { $regex: search_query, $options: 'i' } 
+        } 
+    ] }).limit(100)  
+
   } else if (search_all) {
     const quotes = await financeModule.getQueriedStocks(search_all)
     for (const quote of quotes) {
       stocks.push(await saveStock(quote))
     }
+    
   }
   else {
     stocks = await Stock.find({}).limit(100)
@@ -175,3 +133,55 @@ router.get('/', async (req, res, next) => {
 
 // Exports the index router.
 export default router;
+
+// Handle GET requests for the index router.
+router.get('/', async (req, res, next) => {
+  // Extract the search_query and type variables from the request.
+  const { search_query, type } = req.query;
+
+  let stocks = [];
+  // If there is both a type filter and search query then it queries the database 
+  // and filters the results by type, and uses regex to filter if the name OR symbol
+  // matches the search query (ignoring the case).
+
+  // Else if there's only a type filter, it finds stocks by the type.
+  
+  // Else if there's only a search query it finds matching stocks using regex 
+  // to filter if the name OR symbol matches the search query (ignoring the case).
+
+  // Else it just fetches the first 100 stocks.
+  if (type && search_query){
+    stocks = await Stock.find(
+      { type, $or:[ 
+        { 
+          name: { $regex: search_query, $options: 'i' }, 
+          symbol: { $regex: search_query, $options: 'i' } 
+        } 
+      ] }).limit(100)
+
+  } else if (type) {
+    stocks = await Stock.find({ type }).limit(100)
+  } else if (search_query) {
+    stocks = await Stock.find(
+      { $or:[ 
+        { 
+          name: { $regex: search_query, $options: 'i' },
+          symbol: { $regex: search_query, $options: 'i' } 
+        } 
+    ] }).limit(100)
+  }
+  else {
+    stocks = await Stock.find({}).limit(100)
+  }
+
+  // Render the index template, and passes in variables to be used.
+  res.render('index', {
+    title,
+    stocks,
+    types,
+    type,
+    search_query
+    //projectionQuantiles,
+    //actualData: pastData.concat(presentData),
+  });
+});

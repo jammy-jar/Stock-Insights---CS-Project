@@ -1,7 +1,6 @@
 import { deviation, mean, transpose, quantile, ascending } from 'd3';
 import yahooFinance from 'yahoo-finance2';
 import normSinv from './math.js';
-import dataHandler from './data-handler.js';
 
 // Returns an array of symbols of the top trending stocks in the US.
 const getTrendingStocks = async () => {
@@ -18,33 +17,17 @@ const getTrendingStocks = async () => {
 
 // Returns an array of symbols matching the search query.
 const getQueriedStocks = async (query) => {
-
     // Then sends a GET request to the Yahoo Finance API for the queried stocks.
     const queryOptions = { quotesCount: 100 };
     const results = await yahooFinance.search(query, queryOptions);
-
+  
     const symbolsArr = results.quotes.map(({symbol}) => symbol)
+    if (symbolsArr.length == 0) {
+        return []
+    }
 
     // Calls the getStocksQuotes function to get all stock data, for the trending symbols, then returns the data.
     return await yahooFinance.quote(symbolsArr, {}, { validateResult: false });
-}
-
-const fetchHistoricalData = async symbols => {
-    // Create a variable with todays date.
-    const todaysDate = new Date()
-    // Create a variable with last years date.
-    const dateLastYear = new Date(todaysDate - 86400000 * 365);
-
-    // Iterate over symbols and get the historical stock data and add to array.
-    for (let symbol of symbols) {
-        if (dataHandler.existingJson(symbol)) {
-            continue;
-        }
-
-        // GET the historical data for the current symbol.
-        const data = await yahooFinance.historical(symbol, { period1: dateLastYear })
-        dataHandler.createDataJson(symbol, data);
-    }
 }
 
 const getStockStats = (lastPrice, data) => {
@@ -120,8 +103,7 @@ const financeModule = {
     getTrendingStocks,
     getQueriedStocks,
     getQuantiles,
-    projectPrices,
-    fetchHistoricalData
+    projectPrices
 }
 
 export default financeModule;

@@ -2,20 +2,19 @@ extends layout
 
 block content
   main
-    form(action="" id="loginForm") 
+    form(action="/login" method="POST") 
       p
-        label(for="username") Email/ Username:
-        input(type="text" name="existingUsername" id="existingUsername" placeholder="Username" autocomplete="username")
+        label(for="username") Username / Email:
+        input(type="text" name="username" id="username" placeholder="Username" autocomplete="username")
 
       p
         label(for="password") Password:
-        input(type="password" name="existingPassword" id="existingPassword" placeholder="Password" autocomplete="current-password")
-      
-      div(class="buttons")
-        button(id="submitLogin") Login 
+        input(type="password" name="password" id="password" placeholder="Password" autocomplete="password")
+
+      button Login
 
     p Don't have an account? 
-    a(href='./register') Go to Registration      
+    a(href='register') Go to Registration      
 
 block styles
   link(rel='stylesheet', href='/stylesheets/login.css')

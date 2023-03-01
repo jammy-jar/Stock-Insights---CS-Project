@@ -2,25 +2,24 @@ extends layout
 
 block content
   main
-    form(action="" id="registerForm") 
+    form(action="/register" method="POST") 
       p
         label(for="username") Username:
-        input(type="text" name="newUsername" id="newUsername" placeholder="Username" autocomplete="username")
+        input(type="text" name="username" id="username" placeholder="Username")
 
       p
         label(for="email") Email:
-        input(type="text" name="email" id="email" placeholder="Email" autocomplete="username")
+        input(type="text" name="email" id="email" placeholder="Email")
 
       p
         label(for="password") New Password:
-        input(type="password" name="newPassword" id="newPassword" placeholder="Password" autocomplete="new-password")
+        input(type="password" name="password" id="password" placeholder="Password")
 
       p
         label(for="passwordConfirmation") Confirm Password:
-        input(type="password" name="passwordConfirmation" id="passwordConfirmation" placeholder="Password" autocomplete="new-password")
+        input(type="password" name="passwordConfirmation" id="passwordConfirmation" placeholder="Password")
       
-      div(class="buttons")
-        button(id="submitRegister") Register
+      button Register
 
     p Already have an account?
     a(href='login') Go to Login

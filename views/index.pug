@@ -4,12 +4,15 @@ block content
   main
     section(class="filter")
       form(action="") 
-        input(type="text" name="search_query" placeholder="Search Stocks...")
-      form(action="") 
-        select(name="type" placeholder="Select Type..." onchange="this.form.submit()")
-          option(value="" disabled selected) Select Type...
-          - for (let type of types) {
-          option(value=type)=type
+        input(type="text" name="search_query" placeholder="Search Stocks..." value=search_query)
+        select(name="type" onchange="this.form.submit()")
+          option(value="") ANY
+          - for (const t of types) {
+            - if (t == type) {
+              option(value=t selected)=t
+              - continue
+            - }
+            option(value=t)=t
           - }
     section
       table
@@ -22,6 +25,13 @@ block content
             th 1 Year Forecast
             th Stock Graph (1 Year)
         tbody(id="stocksTable")
+    section
+    - if (stocks.length == 0) {
+      p OOPS! Nothing was found matching your search!
+    - }
+    - if (search_query) {
+      a(href=`?search_all=${search_query}&type=${type}`) Show More Results for this Query
+    - }
 
 block styles
   link(rel='stylesheet', href='/stylesheets/index.css')
@@ -29,8 +39,7 @@ block styles
 block scripts
   script.
     const stocks = !{JSON.stringify(stocks)}
-    const types = !{JSON.stringify(types)}
-  script(src='./javascripts/load-data.js' type='module')
+  cript(src='./javascripts/load-data.js' type='module')
 //-
   script.
     const projectionData = !{JSON.stringify(projectionQuantiles)}
