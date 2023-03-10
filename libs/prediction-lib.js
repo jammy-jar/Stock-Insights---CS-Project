@@ -1,4 +1,8 @@
 import * as tf from '@tensorflow/tfjs-node'
+import { deviation, mean, transpose, quantile, ascending } from 'd3';
+import normSinv from './math.js';
+import Stock from '../models/stock.js'
+
 
 function ComputeSMA(data, window_size)
 {
@@ -68,4 +72,100 @@ async function trainModel(inputs, outputs, trainingsize, window_size, n_epochs, 
     });
   
     return { model: model, stats: hist };
+}
+
+// Get an object containing the mean and deviation of the data in the argument.
+const getStockStats = (lastPrice, data) => {
+  const dailyStockChanges = []
+
+  for (let i = 0; i < data.length; i++) {
+      const curDayPrice = data[i].close;
+      const prevDayPrice = i === 0 ? lastPrice : data[i - 1].close;
+      dailyStockChanges.push((curDayPrice - prevDayPrice) / prevDayPrice);
   }
+
+  return {
+      mean: mean(dailyStockChanges),
+      standardDeviation: deviation(dailyStockChanges)
+  }
+}
+
+const projectNextData = (currPrice, meanDailyChange, stdDevDailyChange) => {
+  const drift = meanDailyChange - (stdDevDailyChange * stdDevDailyChange) / 2;
+  const randomShock = stdDevDailyChange * normSinv(Math.random());
+  return currPrice * Math.exp(drift + randomShock);
+}
+
+const projectPrices = data => {
+  const lastPrice = data[0].close;
+  const lastDate = data[data.length - 1].date;
+  data.shift();
+
+  let { mean, standardDeviation } = getStockStats(lastPrice, data);
+  const projections = []
+
+  for (let i = 0; i < 30; i++) {
+      const projection = [];
+
+      for (let j = 0; j < data.length; j++) {
+          const priorPrice = j === 0 ? data[data.length - 1].close : projection[j - 1].close;
+
+          projection.push({
+          date: new Date(lastDate.getTime() + 86400000 * j),
+          close: projectNextData(
+              priorPrice,
+              mean,
+              standardDeviation
+          )
+          });
+      }
+
+      projections.push(projection)
+  }
+
+  return projections;
+}
+
+const getQuantiles = (matrix, yAccessor, quantiles) => {
+  const dates = matrix[0].map(day => day.date);
+
+  const transposed = transpose(matrix).map(d =>
+      d.map(dr => yAccessor(dr)).sort(ascending)
+    );
+  const quantilesArr = [];
+  for (let i = 0; i < quantiles.length; i++) {
+    const quantileNum = quantiles[i];
+    const quantileData = transposed.map(day => quantile(day, quantileNum));
+    const quantileArr = []
+    quantileData.forEach((day, i) => quantileArr.push({ close: day, date: dates[i] }));
+
+    quantilesArr.push(quantileArr)
+  }
+  return quantilesArr;
+}
+
+// Use the Monte Carlo Method to, create projections for the stocks, based on last years trend,
+// Return an array of projections at the 0.1, 0.25, 0.5, 0.75, and 0.9th quantiles.
+const projectStocks = async (symbol) => {
+  // Find the first (and only) stock in the database with the given symbol.
+  const stock = await Stock.findOne({symbol})
+
+  // Simulate 30 projections, using Geometric Brownian Motion for random projections,
+  // with a trend.
+  const projections = projectPrices(stock.data)
+
+  // Break the projections down and get the corresponding quanitiles.
+  const projectionQuantiles = getQuantiles(projections, d => d.close, [
+    0.1,
+    0.25,
+    0.5,
+    0.75,
+    0.9
+  ]);
+
+  return projectionQuantiles;
+}
+
+export default {
+  projectStocks,
+}

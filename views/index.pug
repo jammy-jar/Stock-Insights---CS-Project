@@ -1,48 +1,57 @@
 extends layout
 
 block content
-  main
-    section(class="filter")
-      form(action="") 
-        input(type="text" name="search_query" placeholder="Search Stocks..." value=search_query)
-        select(name="type" onchange="this.form.submit()")
-          option(value="") ANY
-          - for (const t of types) {
-            - if (t == type) {
-              option(value=t selected)=t
-              - continue
-            - }
-            option(value=t)=t
-          - }
+  main(class='container px-0')
     section
-      table
+      form(action='') 
+        div(class='row')
+          div(class='form-group col-3')
+            input(class='form-control' type="text" name="search_query" placeholder="Search Stocks..." value=search_query)
+          div(class='form-group col')
+            select(class='form-select' name="type")
+              option(value="" selected disabled) Type
+              option(value='') ANY
+              - for (const t of types) {
+                option(value=t)=t
+              - }
+          div(class='form-group col')
+            select(class='form-select' name="sort")
+              option(value="price" selected disabled) Sort by...
+              option(value="symbol") Alphabetical
+              option(value="price") Price
+          div(class='form-group col')
+            select(class='form-select' name="order")
+              option(value=-1 selected disabled) Sort order
+              option(value=1) Ascending
+              option(value=2) Descending
+          div(class='col')
+            button(class='btn btn-primary') Apply
+
+    section
+      table(class='table table-striped table-hover')
         thead
           tr
-            th Symbol 
-            th Stock
-            th Price ($)
-            th 7 Day Forecast 
-            th 1 Year Forecast
-            th Stock Graph (1 Year)
-        tbody(id="stocksTable")
+            th(scope='col') Symbol 
+            th(scope='col') Stock
+            th(scope='col') Price ($)
+            th(scope='col') 7 Day Forecast 
+            th(scope='col') 1 Year Forecast
+            th(scope='col') Stock Graph (1 Year)
+        tbody(class='table-group-divider' id="stocksTable")
+
     section
-    - if (stocks.length == 0) {
-      p OOPS! Nothing was found matching your search!
-    - }
     - if (search_query) {
-      a(href=`?search_all=${search_query}&type=${type}`) Show More Results for this Query
+      a(class='btn btn-outline-secondary' href=`?search_all=${search_query}&type=${type}`) Show More Results for this Query
     - }
 
 block styles
-  link(rel='stylesheet', href='/stylesheets/index.css')
+  //- link(rel='stylesheet', href='/stylesheets/index.css')
 
 block scripts
+  script(src='../javascripts/index-plot-util.js')
+  script(src='../javascripts/infinite-scroll.js')
+  script(src='../javascripts/load-data.js')
   script.
-    const stocks = !{JSON.stringify(stocks)}
-  cript(src='./javascripts/load-data.js' type='module')
-//-
-  script.
-    const projectionData = !{JSON.stringify(projectionQuantiles)}
-    const actualData = !{JSON.stringify(actualData)}
-  script(type='module' src='/javascripts/plot-utility.js')
+    getStocks(pageNum).then(stocks => listStocks(stocks));
+   
   

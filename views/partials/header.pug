@@ -1,21 +1,28 @@
 head
-  link(rel='stylesheet', href='/stylesheets/header.css')
+  //- link(rel='stylesheet', href='/stylesheets/header.css')
 
 body
-  header
-    h1= title
-  nav(class="navbar")
-    ul
-      li
-        // This redirects the user to the watchlist page.
-        a(href='./') Menu 
-
-      li
-        // This redirects the user to the watchlist page.
-        a(href='./watchlist') Watchlist
-    
-      li(class="right")
-        // This redirects the user to the watchlist page. 
-        // I edited the style so it appears to the right of the page.
-        a(href='./login') Login
-  hr  
+  nav(class='mb-3 border-bottom navbar sticky-top navbar-expand bg-body')
+    div(class='d-flex container-fluid')
+      a(class='navbar-brand' href='#')= title
+      div(class='me-auto')
+        ul(class='navbar-nav')
+          li(class='nav-item')
+            // Redirect the user to the index page.
+            a(class='nav-link' href='./') Menu 
+          li(class='nav-item')
+            // Redirect the user to the watchlist page.
+            a(class='nav-link' href='./watchlist') Watchlist
+      
+      div
+        ul(class='navbar-nav')
+          li(class='nav-item')
+            button(type='button' id='colorbtn' class='nav-link btn btn-secondary') Color Toggle
+          li(class='nav-item')
+            // Redirect the user to the login page. 
+            - if (currentUser) {
+            a(class='nav-link' href='./logout') Logout
+            - } else {
+            a(class='nav-link' href='./login') Login
+            - }
+  script(src="../javascripts/navbar.js")

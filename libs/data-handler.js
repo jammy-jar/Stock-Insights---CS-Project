@@ -1,3 +1,7 @@
+import yahooFinance from 'yahoo-finance2'
+import Stock from '../models/stock.js'
+import prediction from './prediction-lib.js';
+
 const saveStock = async (quote) => {
     // Search the database for an existing stock and finds the first one matching the symbol.
     let stockDbObject = await Stock.findOne({symbol: quote.symbol})
@@ -66,6 +70,11 @@ const saveStock = async (quote) => {
   
     // Save any changes.
     await stockDbObject.save()
+
+    stockDbObject.projections = await prediction.projectStocks(quote.symbol)
+
+    await stockDbObject.save()
+
     return stockDbObject
   }
 

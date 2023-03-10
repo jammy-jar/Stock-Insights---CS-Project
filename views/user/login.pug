@@ -1,0 +1,28 @@
+extends ../layout
+
+block content
+  main(class='container w-50 border p-3')
+    div
+      p(class='error')=error
+    form(action="/login" method="POST") 
+      div(class='form-group')
+        label(class='form-label' for="username") Username / Email:
+        input(class='form-control' type="text" name="username" id="username" placeholder="Username" autocomplete="username")
+
+      div(class='form-group')
+        label(class='form-label' for="password") Password:
+        input(class='form-control' type="password" name="password" id="password" placeholder="Password" autocomplete="password")
+
+      button(class='btn btn-primary') Login
+
+    section
+      p Don't have an account? 
+      div(class='btn-group')
+        a(class='btn btn-secondary' href='register') Register
+        a(class='btn btn-outline-secondary' href='/') Continue as Guest
+
+block styles
+  //- link(rel='stylesheet', href='/stylesheets/login.css')
+
+block scripts
+    

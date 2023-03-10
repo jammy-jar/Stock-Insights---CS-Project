@@ -1,0 +1,47 @@
+extends ../layout
+
+block content
+  main(class='container')
+    div(class='btn-group' role='group')
+        - const initialStock = stocks[0];
+        label(class='btn btn-outline-primary')
+            input(type='radio' class='btn-check' autocomplete='off' name='btnradio' onclick=`selectPlot("${initialStock.symbol}")` checked)
+            =initialStock.symbol
+        - for (const stock of stocks.slice(1)) {
+        label(class='btn btn-outline-primary')
+            input(type='radio' class='btn-check' autocomplete='off' name='btnradio' onclick=`selectPlot("${stock.symbol}")`)
+            =stock.symbol
+        - }
+    div(id='graphPlot')
+    section
+      table(class='table table-striped table-hover')
+        thead
+          tr
+            th Symbol 
+            th Stock
+            th Price ($)
+            th 7 Day Forecast 
+            th 1 Year Forecast
+            th % Change Since Added
+        tbody(class='table-group-divider' id="stocksTable")
+    section
+        - if (!stocks[0]) {
+        p Hmm, your Watchlist is empty!
+        - }
+
+block scripts
+    script(src="https://cdn.plot.ly/plotly-2.18.2.min.js")
+    script(src='../javascripts/load-data.js')
+    script(src="../javascripts/plot-util.js")
+    script.
+        const user = !{JSON.stringify(user)}
+        const stocks = !{JSON.stringify(stocks)}
+        listWatchedStocks();
+        const selectPlot = symbol => {
+            const stock = stocks.filter(stock => stock.symbol == symbol)[0]
+            if (!stock) {
+                return
+            }
+            createPlot(stock.name, stock.symbol, stock.data, stock.projections)
+        }
+        createPlot(stocks[0].name, stocks[0].symbol, stocks[0].data, stocks[0].projections)

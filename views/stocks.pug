@@ -1,0 +1,23 @@
+extends layout
+
+block content 
+    main(class='container')
+        div(class='d-flex justify-content-between')
+            div
+                button(button='button' class='btn btn-primary' data-bs-toggle="button" onclick='toggleGraph()') Toggle Candlestick
+            div
+                form(action='/watchlist/add' method='POST')
+                    button(class='btn btn-outline-primary ms-auto' name='stockSymbol' value=stock.symbol) Add to Watchlist
+        div(id='graphPlot')
+        div(id='bullBearPlot')
+
+block scripts
+    script(src="https://cdn.plot.ly/plotly-2.18.2.min.js")
+    script(src="./javascripts/plot-util.js")
+    script.
+        const stock = !{JSON.stringify(stock)}
+        const bullishScore = !{JSON.stringify(bullishScore)}
+        createPlot(stock.name, stock.symbol, stock.data, stock.projections)
+        if (bullishScore) {
+            plotMeter(bullishScore)
+        }

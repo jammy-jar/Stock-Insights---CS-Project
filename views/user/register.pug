@@ -1,0 +1,148 @@
+extends ../layout
+
+block content
+  main(class='container w-50 border p-3')
+    form(id='register' action="/register" method="POST" onsubmit="validate()")
+      div(class='form-group')
+        label(class='form-label' for="username") Username:
+        input(class='form-control' type="text" name="username" id="username" placeholder="Username" required)
+        div(class='messages text-danger')
+
+      div(class='form-group')
+        label(class='form-label' for="email") Email:
+        input(class='form-control' type="text" name="email" id="email" placeholder="Email" required)
+        div(class='messages text-danger')
+
+      div(class='form-group')
+        label(class='form-label' for="password") New Password:
+        input(class='form-control' type="password" name="password" id="password" placeholder="Password" required)
+        div(class='messages text-danger')
+
+      div(class='form-group')
+        label(class='form-label' for="confirm-password") Confirm Password:
+        input(class='form-control' type="password" name="confirm-password" id="confirm-password" placeholder="Password" required)
+        div(class='messages')
+        
+      button(class='btn btn-primary') Register
+
+    section
+      p Already have an account? 
+      div(class='btn-group')
+        a(class='btn btn-secondary' href='login') Login
+        a(class='btn btn-outline-secondary' href='/') Continue as Guest
+        
+
+block styles
+  //- link(rel='stylesheet', href='/stylesheets/login.css')
+
+block scripts
+  script(src="//cdnjs.cloudflare.com/ajax/libs/validate.js/0.13.1/validate.min.js")
+  script(src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js")
+  script.
+    const constraints = {
+      email: {
+        presence: true,
+        email: true
+      },
+      password: {
+        presence: true,
+        length: {
+          minimum: 8
+        }
+      },
+      "confirm-password": {
+        presence: true,
+        equality: {
+          attribute: "password",
+          message: "Passwords do not match!"
+        }
+      },
+      username: {
+        presence: true,
+        length: {
+          minimum: 3,
+          maximum: 20
+        },
+        format: {
+          pattern: "[a-z0-9]+",
+          flags: "i",
+          message: "can only contain a-z and 0-9"
+        }
+      },
+    }
+
+    var form = document.querySelector("form#register");
+    form.addEventListener("submit", function(ev) {
+      ev.preventDefault();
+      handleFormSubmit(form);
+    });
+
+    var inputs = document.querySelectorAll("input, textarea, select")
+    for (var i = 0; i < inputs.length; ++i) {
+      inputs.item(i).addEventListener("change", function(ev) {
+        var errors = validate(form, constraints) || {};
+        showErrorsForInput(this, errors[this.name])
+      });
+    }
+
+    function handleFormSubmit(form, input) {
+      var errors = validate(form, constraints);
+      showErrors(form, errors || {});
+      if (!errors) {
+        form.submit();
+      }
+    }
+
+    function showErrors(form, errors) {
+      _.each(form.querySelectorAll("input[name], select[name]"), function(input) {
+        showErrorsForInput(input, errors && errors[input.name]);
+      });
+    }
+
+    function showErrorsForInput(input, errors) {
+      var formGroup = closestParent(input.parentNode, "form-group")
+        , messages = formGroup.querySelector(".messages");
+      resetFormGroup(formGroup);
+      
+      if (errors) {
+        formGroup.classList.add("has-error");
+        _.each(errors, function(error) {
+          addError(messages, error);
+        });
+      } else {
+        formGroup.classList.add("has-success");
+      }
+    }
+
+    // Recusively finds the closest parent that has the specified class
+    function closestParent(child, className) {
+      if (!child || child == document) {
+        return null;
+      }
+      if (child.classList.contains(className)) {
+        return child;
+      } else {
+        return closestParent(child.parentNode, className);
+      }
+    }
+
+    function resetFormGroup(formGroup) {
+      formGroup.classList.remove("has-error");
+      formGroup.classList.remove("has-success");
+
+      _.each(formGroup.querySelectorAll(".help-block.error"), function(el) {
+        el.parentNode.removeChild(el);
+      });
+    }
+
+    // Adds the specified error with the following markup
+    // <p class="help-block error">[message]</p>
+    function addError(messages, error) {
+      var block = document.createElement("p");
+      block.classList.add("help-block");
+      block.classList.add("error");
+      block.innerText = error;
+      messages.appendChild(block);
+    }
+
+
