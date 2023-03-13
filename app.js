@@ -34,7 +34,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/stockApp')
     })
     .catch(err => {
         console.log('Failed to open Mongo Connection. Err: ' + err)
-    })
+    });
 
 const sessionConfig = {
     secret: 'weaksecret',
@@ -58,7 +58,6 @@ passport.deserializeUser(User.deserializeUser())
 
 app.use((req, res, next) => {
     res.locals.currentUser = req.user;
-    res.locals.colorMode = req.colorMode;
     res.locals.error = req.flash('error');
     res.locals.success = req.flash('success');
     next()

@@ -43,11 +43,6 @@ const updateService = async () => {
 }
 updateService();
 
-router.get('/', catchAsync(async (req, res, next) => {
-  
-  next()
-}))
-
 // Handle GET requests for the index router.
 router.get('/', catchAsync(async (req, res, next) => {
   // Extract the variables from the request.

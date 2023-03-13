@@ -13,7 +13,7 @@ export const isLoggedIn = (req, res, next) => {
     // Flash an error when sent to the login page.
     req.flash('error', 'You must be signed in to do this!');
 
-    return res.redirect('/login')
+    res.redirect('/login')
 }
 
 export const isGuest = (req, res, next) => {

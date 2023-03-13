@@ -15,13 +15,14 @@ let insight;
 let bullishScore;
 
 router.get('/list', catchAsync(async (req, res, next) => {
+    console.log('route has been reached')
     let stocks = [];
 
     // Extract the variables from the request.
     const { pageNum, search_all, search_query, type, sort = 'price', order = -1 } = req.query;
 
     const skip = pageNum*40;
-    const limit = pageNum*40 + 40;
+    const limit = 40;
 
     // If there is both a type filter and search query then it queries the database 
     // and filters the results by type, and uses regex to filter if the name OR symbol
@@ -39,6 +40,7 @@ router.get('/list', catchAsync(async (req, res, next) => {
             { name: { $regex: search_query, $options: 'i' } },
             { symbol: { $regex: search_query, $options: 'i' } } 
         ] }).sort({[sort]: order}).skip(skip).limit(limit)
+
     } else if (search_all && type) {
         try {
         const quotes = await financeModule.getQueriedStocks(search_all)
@@ -54,6 +56,7 @@ router.get('/list', catchAsync(async (req, res, next) => {
                 { symbol: { $regex: search_all, $options: 'i' } } 
             ] }).sort({[sort]: order}).skip(skip).limit(limit)
         stocks = stocks.filter(stock => stock.type == type)
+
     } else if (type) {
         stocks = await Stock.find({ type }).sort({[sort]: order}).skip(skip).limit(limit)
     } else if (search_query) {
@@ -62,6 +65,7 @@ router.get('/list', catchAsync(async (req, res, next) => {
             { name: { $regex: search_query, $options: 'i' } },
             { symbol: { $regex: search_query, $options: 'i' } } 
         ] }).sort({[sort]: order}).skip(skip).limit(limit)
+
     } else if (search_all) {
         try {
             const quotes = await financeModule.getQueriedStocks(search_all)
@@ -69,17 +73,18 @@ router.get('/list', catchAsync(async (req, res, next) => {
             for (const quote of quotes) {
                 await dataHandler.saveStock(quote)
             }
-            } catch {}
-    
-            stocks = await Stock.find(
-                { $or:[   
-                    { name: { $regex: search_all, $options: 'i' } },
-                    { symbol: { $regex: search_all, $options: 'i' } } 
-                ] }).sort({[sort]: order}).skip(skip).limit(limit)
+        } catch {}
+
+        stocks = await Stock.find(
+            { $or:[   
+                { name: { $regex: search_all, $options: 'i' } },
+                { symbol: { $regex: search_all, $options: 'i' } } 
+            ] }).sort({[sort]: order}).skip(skip).limit(limit)
     }
     else {
         stocks = await Stock.find({}).sort({[sort]: order}).skip(skip).limit(limit)
     }
+    console.log(stocks.map(({symbol}) => symbol))
     res.json(stocks)
 }));
 

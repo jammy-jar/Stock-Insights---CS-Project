@@ -44,7 +44,7 @@ const listStocks = stocks => {
 }
 
 // Function displays stocks in the table on the watchlist page.
-const listWatchedStocks = () => {
+const listWatchedStocks = stocks => {
 
     // Iterate through the selected stocks.
     for (const stock of stocks) {
@@ -105,10 +105,10 @@ const getStocks = async () => {
     let res;
     if (window.location.search) {
         res = await fetch(
-            `http://localhost:8080/list${window.location.search}&pageNum=${pageNum}`
+            `/list${window.location.search}&pageNum=${pageNum}`
             );
     } else {
-        res = await fetch(`http://localhost:8080/list?pageNum=${pageNum}`);
+        res = await fetch(`/list?pageNum=${pageNum}`);
     }
     return await res.json();
 }

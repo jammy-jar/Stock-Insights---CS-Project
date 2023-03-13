@@ -53,7 +53,6 @@ router.post('/register', isGuest,
   // Check if 'returnTo' is defined, if so, when it returns the user it returns them to the
   // 'returnTo' page, else it returns them to the base directory ('/').
   const redirectUrl = req.session.returnTo || '/';
-  delete req.session.returnTo;
   req.flash('success', 'Your account has been created, and you are logged in!')
   res.redirect(redirectUrl);
 }))
@@ -73,7 +72,6 @@ router.post('/login', isGuest, passport.authenticate('local', { failureFlash: tr
   // Check if 'returnTo' is defined, if so, when it returns the user it returns them to the
   // 'returnTo' page, else it returns them to the base directory ('/').
   const redirectUrl = req.session.returnTo || '/';
-  delete req.session.returnTo;
   req.flash('success', 'You are now logged in!')
   res.redirect(redirectUrl);
 })

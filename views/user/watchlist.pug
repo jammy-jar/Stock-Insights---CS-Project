@@ -36,7 +36,7 @@ block scripts
     script.
         const user = !{JSON.stringify(user)}
         const stocks = !{JSON.stringify(stocks)}
-        listWatchedStocks();
+        listWatchedStocks(stocks);
         const selectPlot = symbol => {
             const stock = stocks.filter(stock => stock.symbol == symbol)[0]
             if (!stock) {
