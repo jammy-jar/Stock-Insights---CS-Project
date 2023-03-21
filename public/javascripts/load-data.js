@@ -22,7 +22,7 @@ const listStocks = stocks => {
 
         // Create a new canvas element, and plot the data with the 'createIndexPlot' function.
         const plotCanvas = document.createElement("CANVAS");
-        plotCanvas.classList.add('w-75')
+        plotCanvas.style.blockSize = '4em';
         createIndexPlot(plotCanvas, stock.symbol, stock.data)
 
         // Insert cells with the stock's data.

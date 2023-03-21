@@ -2,7 +2,7 @@ head
   //- link(rel='stylesheet', href='/stylesheets/header.css')
 
 body
-  nav(class='mb-3 border-bottom navbar sticky-top navbar-expand bg-body')
+  header(class='mb-3 border-bottom navbar sticky-top navbar-expand bg-body')
     div(class='d-flex container-fluid')
       a(class='navbar-brand' href='#')= title
       div(class='me-auto')
@@ -25,4 +25,9 @@ body
             - } else {
             a(class='nav-link' href='./login') Login
             - }
+
+  footer(class='border-top fixed-bottom bg-body')
+    div(class='d-flex container-fluid justify-content-end')
+      p(class='mb-1') By James Rose
+
   script(src="../javascripts/navbar.js")

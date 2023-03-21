@@ -2,7 +2,7 @@
 let graphToggle = false;
 
 // Create a plot with the stocks past and projected data.
-const createPlot = (name, symbol, historicalData, projectionsData) => {
+const createPlot = (name, historicalData, projectionsData) => {
 
   // Define a layout for the plot.
   const layoutGraph = {
@@ -19,7 +19,18 @@ const createPlot = (name, symbol, historicalData, projectionsData) => {
 
   // Create an array of line traces with data for the plot. 
   const traces = [
-    { x: historicalData.map(({date}) => date), y: historicalData.map(({close}) => close), close: historicalData.map(({close}) => close), open: historicalData.map(({open}) => open), high: historicalData.map(({high}) => high), low: historicalData.map(({low}) => low), type: 'scatter', name: 'Historical', mode: 'lines', line: {color: '#7F7F7F'} },
+    {  
+      x: historicalData.map(({date}) => date), 
+      y: historicalData.map(({close}) => close), 
+      close: historicalData.map(({close}) => close), 
+      open: historicalData.map(({open}) => open), 
+      high: historicalData.map(({high}) => high), 
+      low: historicalData.map(({low}) => low), 
+      type: 'scatter', 
+      name: 'Historical', 
+      mode: 'lines', 
+      line: {color: '#7F7F7F'} 
+    },
     { x: projectionsData[0].map(({date}) => date), y: projectionsData[0].map(({close}) => close), type: 'scatter', name: 'Min', mode: 'lines', line: {color: '#17becf7d'} },
     { 
       x: projectionsData[1].map(({date}) => date), 

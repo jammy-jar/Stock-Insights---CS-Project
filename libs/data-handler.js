@@ -32,7 +32,10 @@ const saveStock = async (quote) => {
   
   // Else it just ends the function.
   if (!stockDbObject) {
-    const data = await yahooFinance.historical(quote.symbol, { period1: dateLastYear })
+    const data = await yahooFinance.historical(quote.symbol, { period1: dateLastYear });
+
+    // Get projection quantiles.
+    const projections = await prediction.projectStocks(data);
 
     // Create a new stock object.
     stockDbObject = new Stock({
@@ -40,7 +43,8 @@ const saveStock = async (quote) => {
         name: displayName,
         price: quote.regularMarketPrice,
         type: quote.quoteType,
-        data
+        data,
+        projections
     })
   } else if (stockDbObject.data[stockDbObject.data.length - 1].date < regularMarketDate) {
     // Get the date of the last time data was updated but not recorded.
@@ -67,6 +71,9 @@ const saveStock = async (quote) => {
     }
     // Update the regular market price to reflect up to date price which is constantly updating.
     stockDbObject.price = quote.regularMarketPrice
+
+    // Update stock projections
+    stockDbObject.projections = await prediction.projectStocks(stockDbObject.data)
   }
   else {
     // Update the regular market price to reflect up to date price which is constantly updating.
@@ -74,10 +81,6 @@ const saveStock = async (quote) => {
   }
 
   // Save any changes.
-  await stockDbObject.save()
-
-  stockDbObject.projections = await prediction.projectStocks(quote.symbol)
-
   await stockDbObject.save()
 
   return stockDbObject

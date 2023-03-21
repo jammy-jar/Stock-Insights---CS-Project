@@ -1,32 +1,36 @@
 extends ../layout
 
 block content
-  main(class='container w-50 border p-3')
+  main(class='container w-50 border rounded p-3')
     form(id='register' action="/register" method="POST" onsubmit="validate()")
-      div(class='form-group')
-        label(class='form-label' for="username") Username:
+      div(class='mt-2 form-group')
+        div(class='d-flex')
+          label(class='form-label mb-0' for="username") Username
+          span(class='messages text-danger ms-auto')
         input(class='form-control' type="text" name="username" id="username" placeholder="Username" required)
-        div(class='messages text-danger')
 
-      div(class='form-group')
-        label(class='form-label' for="email") Email:
+      div(class='mt-2 form-group')
+        div(class='d-flex')
+          label(class='form-label mb-0' for="email") Email
+          span(class='messages text-danger ms-auto')
         input(class='form-control' type="text" name="email" id="email" placeholder="Email" required)
-        div(class='messages text-danger')
 
-      div(class='form-group')
-        label(class='form-label' for="password") New Password:
+      div(class='mt-2 form-group')
+        div(class='d-flex')
+          label(class='form-label mb-0 me-4' for="password") Password
+          span(class='messages text-danger ms-auto')
         input(class='form-control' type="password" name="password" id="password" placeholder="Password" required)
-        div(class='messages text-danger')
 
-      div(class='form-group')
-        label(class='form-label' for="confirm-password") Confirm Password:
+      div(class='mt-2 form-group')
+        div(class='d-flex')
+          label(class='form-label mb-0' for="confirm-password") Confirm Password
+          span(class='messages text-danger ms-auto')
         input(class='form-control' type="password" name="confirm-password" id="confirm-password" placeholder="Password" required)
-        div(class='messages')
         
-      button(class='btn btn-primary') Register
+      button(class='btn btn-primary mt-3') Register
 
-    section
-      p Already have an account? 
+    section(class='mt-3')
+      p(class='mb-0') Already have an account? 
       div(class='btn-group')
         a(class='btn btn-secondary' href='login') Login
         a(class='btn btn-outline-secondary' href='/') Continue as Guest
@@ -48,7 +52,11 @@ block scripts
         presence: true,
         length: {
           minimum: 8
-        }
+        },
+        format: {
+          pattern: /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$/,
+          message: "must contain at least 1 lower-case letter, 1 capital letter and 1 number!"
+        },
       },
       "confirm-password": {
         presence: true,
@@ -66,7 +74,7 @@ block scripts
         format: {
           pattern: "[a-z0-9]+",
           flags: "i",
-          message: "can only contain a-z and 0-9"
+          message: "must be alphanumeric!"
         }
       },
     }
@@ -141,6 +149,8 @@ block scripts
       var block = document.createElement("p");
       block.classList.add("help-block");
       block.classList.add("error");
+      block.classList.add("mb-0");
+      block.classList.add("text-end")
       block.innerText = error;
       messages.appendChild(block);
     }

@@ -11,16 +11,33 @@ const router = express.Router();
 const title = 'Login'
 
 // Return and render the template when a request is made to /register.
-router.get('/register', (req, res, next) => {
+router.get('/register', isGuest, (req, res, next) => {
   res.render('user/register', {
     title
   });
 });
 
+// Return and render the template when a request is made to /login.
+router.get('/login', isGuest, (req, res, next) => {
+  res.render('user/login', { 
+    title
+  });
+});
+
+// Log out a user when a request is made to '/logout'.
+// Use the logout function which is added to the request object by the passport library.
+router.get('/logout', isLoggedIn, catchAsync(async (req, res, next) => {
+  req.logout(err => {
+    if (err) { return next(err); }
+    req.flash('success', 'You are now logged out!');
+    res.redirect('/');
+  });
+}));
+
 // When the registration form is posted, respond by making a new user, and registering
 // the new user to the database.
 // Use the register function which is added to the request object by the passport library.
-router.post('/register', isGuest,
+router.post('/register',
   body('username').isLength({
     min: 3,
     max: 20
@@ -29,7 +46,9 @@ router.post('/register', isGuest,
   body('email').isEmail().normalizeEmail().withMessage("Entered Email is invalid!"),
   body('password').isLength({
     min: 8,
-  }).withMessage("Password must be greater than 8 characters."), 
+  })
+    .withMessage("Password must be greater than 8 characters.")
+    .matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$/).trim().escape(), 
   catchAsync(async (req, res, next) => {
   const { username, email, password } = req.body;
 
@@ -57,33 +76,18 @@ router.post('/register', isGuest,
   res.redirect(redirectUrl);
 }))
 
-// Return and render the template when a request is made to /login.
-router.get('/login', isGuest, (req, res, next) => {
-  res.render('user/login', { 
-    title
-  });
-});
-
 // Authenticate if login info is valid, using the passport library's built in 'authenticate'
 // function.
 // If the an error occurs, it will flash, and it is set to redirect them to the login
 // page upon failure.
-router.post('/login', isGuest, passport.authenticate('local', { failureFlash: true, failureRedirect: '/login' }), async (req, res) => {
+router.post('/login', 
+  passport.authenticate('local', { failureFlash: true, failureRedirect: '/login' }), 
+  (req, res) => {
   // Check if 'returnTo' is defined, if so, when it returns the user it returns them to the
   // 'returnTo' page, else it returns them to the base directory ('/').
   const redirectUrl = req.session.returnTo || '/';
   req.flash('success', 'You are now logged in!')
   res.redirect(redirectUrl);
 })
-
-// Log out a user when a request is made to '/logout'.
-// Use the logout function which is added to the request object by the passport library.
-router.get('/logout', isLoggedIn, catchAsync(async (req, res, next) => {
-  req.logout(err => {
-    if (err) { return next(err); }
-    req.flash('success', 'You are now logged out!');
-    res.redirect('/');
-  });
-}));
 
 export default router;

@@ -15,7 +15,6 @@ let insight;
 let bullishScore;
 
 router.get('/list', catchAsync(async (req, res, next) => {
-    console.log('route has been reached')
     let stocks = [];
 
     // Extract the variables from the request.
@@ -43,11 +42,11 @@ router.get('/list', catchAsync(async (req, res, next) => {
 
     } else if (search_all && type) {
         try {
-        const quotes = await financeModule.getQueriedStocks(search_all)
+            const quotes = await financeModule.getQueriedStocks(search_all)
 
-        for (const quote of quotes) {
-            await dataHandler.saveStock(quote)
-        }
+            for (const quote of quotes) {
+                await dataHandler.saveStock(quote)
+            }
         } catch {}
 
         stocks = await Stock.find(
@@ -84,7 +83,6 @@ router.get('/list', catchAsync(async (req, res, next) => {
     else {
         stocks = await Stock.find({}).sort({[sort]: order}).skip(skip).limit(limit)
     }
-    console.log(stocks.map(({symbol}) => symbol))
     res.json(stocks)
 }));
 
@@ -94,7 +92,7 @@ router.get('/:id', catchAsync(async (req, res, next) => {
     next()
 }));
 
-router.get('/:id', catchAsync(async (req, res, next) => {
+router.get('/:id', (req, res, next) => {
     if(insight && insight.instrumentInfo) {
         bullishScore = insight.instrumentInfo.technicalEvents.intermediateTermOutlook.score
         if (insight.instrumentInfo.technicalEvents.intermediateTermOutlook.direction == 'Bearish') {
@@ -111,6 +109,6 @@ router.get('/:id', catchAsync(async (req, res, next) => {
       bullishScore,
       stock
     });
-}))
+})
 
 export default router

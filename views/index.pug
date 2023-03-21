@@ -1,30 +1,30 @@
 extends layout
 
 block content
-  main(class='container px-0')
+  main(class='container')
     section
       form(action='') 
         div(class='row')
-          div(class='form-group col-3')
+          div(class='form-group col-5')
             input(class='form-control' type="text" name="search_query" placeholder="Search Stocks..." value=search_query)
-          div(class='form-group col')
+          div(class='form-group col-2')
             select(class='form-select' name="type")
               option(value="" selected disabled) Type
               option(value='') ANY
               - for (const t of types) {
                 option(value=t)=t
               - }
-          div(class='form-group col')
+          div(class='form-group col-2')
             select(class='form-select' name="sort")
               option(value="price" selected disabled) Sort by...
               option(value="symbol") Alphabetical
               option(value="price") Price
-          div(class='form-group col')
+          div(class='form-group col-2')
             select(class='form-select' name="order")
               option(value=-1 selected disabled) Sort order
               option(value=1) Ascending
               option(value=2) Descending
-          div(class='col')
+          div(class='col-1')
             button(class='btn btn-primary') Apply
 
     section
