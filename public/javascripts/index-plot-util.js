@@ -1,5 +1,8 @@
 // Declare a function that iterates through the data and graphs the data for each stock.
 createIndexPlot = (canvas, symbol, data) => {
+    if (data.length == 0) {
+        return;
+    }
     // Create a canvas context.
     const ctx = canvas.getContext('2d');
 

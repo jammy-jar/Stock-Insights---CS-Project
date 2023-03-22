@@ -27,7 +27,7 @@ router.post('/add', isLoggedIn, catchAsync(async (req, res, next) => {
     await user.save();
 
     req.flash('success', 'Added Stock to your Watchlist!')
-    res.redirect('/' + symbol)
+    res.redirect('/stocks/' + symbol)
 }));
 
 router.post('/remove', isLoggedIn, catchAsync(async (req, res, next) => {

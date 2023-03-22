@@ -9,10 +9,10 @@ body
         ul(class='navbar-nav')
           li(class='nav-item')
             // Redirect the user to the index page.
-            a(class='nav-link' href='./') Menu 
+            a(class='nav-link' href='../') Menu 
           li(class='nav-item')
             // Redirect the user to the watchlist page.
-            a(class='nav-link' href='./watchlist') Watchlist
+            a(class='nav-link' href='../watchlist') Watchlist
       
       div
         ul(class='navbar-nav')
@@ -21,9 +21,9 @@ body
           li(class='nav-item')
             // Redirect the user to the login page. 
             - if (currentUser) {
-            a(class='nav-link' href='./logout') Logout
+            a(class='nav-link' href='../logout') Logout
             - } else {
-            a(class='nav-link' href='./login') Login
+            a(class='nav-link' href='../login') Login
             - }
 
   footer(class='border-top fixed-bottom bg-body')

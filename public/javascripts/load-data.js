@@ -18,7 +18,7 @@ const listStocks = stocks => {
         // and a data-href of the stocks symbol.
         const row = tableBody.insertRow(-1)
         row.classList.add('clickable-row', 'align-middle')
-        $(row).attr('data-href', stock.symbol);
+        $(row).attr('data-href', 'stocks/' + stock.symbol);
 
         // Create a new canvas element, and plot the data with the 'createIndexPlot' function.
         const plotCanvas = document.createElement("CANVAS");
@@ -52,7 +52,7 @@ const listWatchedStocks = stocks => {
         // and a data-href of the stocks symbol.
         const row = tableBody.insertRow(-1)
         row.classList.add('clickable-row', 'align-middle')
-        $(row).attr('data-href', stock.symbol);
+        $(row).attr('data-href', 'stocks/' + stock.symbol);
 
         // Calculate the percentage change for the stock, by comparing the value when it was
         // first watched, to the value now.
@@ -105,10 +105,10 @@ const getStocks = async () => {
     let res;
     if (window.location.search) {
         res = await fetch(
-            `/list${window.location.search}&pageNum=${pageNum}`
+            `/stocks/list${window.location.search}&pageNum=${pageNum}`
             );
     } else {
-        res = await fetch(`/list?pageNum=${pageNum}`);
+        res = await fetch(`/stocks/list?pageNum=${pageNum}`);
     }
     return await res.json();
 }

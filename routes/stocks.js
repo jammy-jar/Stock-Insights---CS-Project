@@ -1,6 +1,8 @@
 // Import modules which will be used.
 import express from 'express';
 import yahooFinance from 'yahoo-finance2';
+import financeModule from '../libs/finance-lib.js';
+import dataHandler from '../libs/data-handler.js';
 
 // Import my modules.
 import catchAsync from '../utils/catchAsync.js';
@@ -47,7 +49,9 @@ router.get('/list', catchAsync(async (req, res, next) => {
             for (const quote of quotes) {
                 await dataHandler.saveStock(quote)
             }
-        } catch {}
+        } catch (e) {
+            console.log('Error when querying stocks: ' + e)
+        }
 
         stocks = await Stock.find(
             { $or:[   
@@ -72,7 +76,9 @@ router.get('/list', catchAsync(async (req, res, next) => {
             for (const quote of quotes) {
                 await dataHandler.saveStock(quote)
             }
-        } catch {}
+        } catch (e) {
+            console.log('Error when querying stocks: ' + e)
+        }
 
         stocks = await Stock.find(
             { $or:[   
@@ -88,7 +94,9 @@ router.get('/list', catchAsync(async (req, res, next) => {
 
 router.get('/:id', catchAsync(async (req, res, next) => {
     stock = await Stock.findOne({ symbol: req.params.id });
-    insight = await yahooFinance.insights(stock.symbol)
+    try {
+        insight = await yahooFinance.insights(stock.symbol);
+    } catch {}
     next()
 }));
 

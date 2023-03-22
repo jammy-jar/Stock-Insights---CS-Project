@@ -28,8 +28,9 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static(path.join(__dirname, 'public')))
 
-mongoose.connect('mongodb://127.0.0.1:27017/stockApp')
-    .then(() => {
+mongoose.connect('mongodb+srv://vaindev:qikyJURWEB8Hv8BV@stockapp-cluster.czjqokk.mongodb.net/?retryWrites=true&w=majority')
+// mongoose.connect('mongodb://127.0.0.1:27017/stockApp')
+.then(() => {
         console.log('Mongo Connection Open!')
     })
     .catch(err => {
@@ -66,8 +67,8 @@ app.use((req, res, next) => {
 // When the home directory receives a request, 
 // the request calls the functions defined in the index router file.
 app.use('/watchlist', watchlistRouter);
+app.use('/stocks', stocksRouter);
 app.use('/', userRouter);
-app.use('/', stocksRouter);
 app.use('/', indexRouter);
 
 // Sets my app to be listening to connections to port 8080. 

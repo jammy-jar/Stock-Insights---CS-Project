@@ -46,6 +46,9 @@ const saveStock = async (quote) => {
         data,
         projections
     })
+  } else if (stockDbObject.data.length == 0) {
+    stockDbObject.data = await yahooFinance.historical(quote.symbol, { period1: new Date(todaysDate - 86400000 * 365) })
+    stockDbObject.projections = await prediction.projectStocks(stockDbObject.data)
   } else if (stockDbObject.data[stockDbObject.data.length - 1].date < regularMarketDate) {
     // Get the date of the last time data was updated but not recorded.
     const lastUnrecordedData = new Date(stockDbObject.data[stockDbObject.data.length - 1].date.valueOf() + 86400000)

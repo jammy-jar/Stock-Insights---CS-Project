@@ -34,8 +34,8 @@ const updateService = async () => {
     }
 
     console.log('Complete!')
-  } catch {
-    console.log('Could not update all Stocks!')
+  } catch (e) {
+    console.log('Could not update all Stocks! Error: ' + e)
   }
   
   // Set the function to recur every 5 minutes.
