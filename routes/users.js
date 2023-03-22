@@ -56,7 +56,8 @@ router.post('/register',
 
   try {
     if (!errors.isEmpty()) {
-      throw new ExpressError(errors.array()[0].msg, 400)
+      const error = errors.array()[0];
+      throw new ExpressError(error.msg, 400)
     }
     const user = new User({ username, email })
     const registeredUser = await User.register(user, password)
