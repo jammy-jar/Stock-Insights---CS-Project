@@ -28,8 +28,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static(path.join(__dirname, 'public')))
 
-mongoose.connect('mongodb+srv://vaindev:qikyJURWEB8Hv8BV@stockapp-cluster.czjqokk.mongodb.net/?retryWrites=true&w=majority')
 // mongoose.connect('mongodb://127.0.0.1:27017/stockApp')
+mongoose.connect('mongodb+srv://vaindev:qikyJURWEB8Hv8BV@stockapp-cluster.czjqokk.mongodb.net/?retryWrites=true&w=majority')
 .then(() => {
         console.log('Mongo Connection Open!')
     })

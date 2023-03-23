@@ -3,6 +3,9 @@ let graphToggle = false;
 
 // Create a plot with the stocks past and projected data.
 const createPlot = (name, historicalData, projectionsData) => {
+  if (historicalData.length == 0) {
+    return;
+  }
 
   // Define a layout for the plot.
   const layoutGraph = {

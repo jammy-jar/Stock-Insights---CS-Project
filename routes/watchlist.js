@@ -17,7 +17,7 @@ router.post('/add', isLoggedIn, catchAsync(async (req, res, next) => {
     if (user.watchlist) {
         if (user.watchlist.some(stock => stock[0] == symbol)) {
             req.flash('error', 'This stock is already in your watchlist!')
-            return res.redirect('/' + symbol)
+            return res.redirect('/stocks/' + symbol)
         }
         user.watchlist.push([symbol, new Date(), stock.price]);
     } else {

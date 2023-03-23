@@ -42,6 +42,6 @@ block scripts
             if (!stock) {
                 return
             }
-            createPlot(stock.name, stock.symbol, stock.data, stock.projections)
+            createPlot(stock.name, stock.data, stock.projections)
         }
-        createPlot(stocks[0].name, stocks[0].symbol, stocks[0].data, stocks[0].projections)
+        createPlot(stocks[0].name, stocks[0].data, stocks[0].projections)
